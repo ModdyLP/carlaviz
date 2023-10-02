@@ -198,18 +198,19 @@ CarlaProxy::CarlaProxy(const std::string& carla_host, uint16_t carla_port, bool 
 
 void CarlaProxy::Init() {
   try {
-    CARLAVIZ_LOG_INFO("Connecting to Carla Server on %s:%u...", carla_host_.c_str(),
-             carla_port_);
-    client_ptr_ =
-        boost::make_shared<carla::client::Client>(carla_host_, carla_port_);
+    CARLAVIZ_LOG_DEBUG("Log test Debug");
+    CARLAVIZ_LOG_INFO("Log test Info");
+    CARLAVIZ_LOG_WARNING("Log test Warning");
+    CARLAVIZ_LOG_ERROR("Log test Error");
+    CARLAVIZ_LOG_ERROR("Connecting to Carla Server on %s:%u...", carla_host_.c_str(), carla_port_);
+    client_ptr_ = boost::make_shared<carla::client::Client>(carla_host_, carla_port_);
     if (client_ptr_ == nullptr) {
       CARLAVIZ_LOG_ERROR("Carla client ptr is null. Exiting");
       return;
     } else {
       client_ptr_->SetTimeout(30s);
       std::string server_version = client_ptr_->GetServerVersion();
-      CARLAVIZ_LOG_INFO("Connected to Carla Server, Server version is: %s",
-               server_version.c_str());
+        CARLAVIZ_LOG_ERROR("Connected to Carla Server, Server version is: %s",server_version.c_str());
     }
 
     world_ptr_ =
@@ -1481,7 +1482,7 @@ utils::Image CarlaProxy::GetEncodedLabelImage(
   for (auto i = 0; i < image.size(); i++) {
     auto p = image[i];
     if (label_color_map.find(p.r) == label_color_map.end()) {
-      CARLAVIZ_LOG_WARNING("Unknown tag: %u", p.r);
+      //CARLAVIZ_LOG_WARNING("Unknown tag: %u", p.r);
       auto& color = label_color_map[0];
       pixel_data[i * 3] = (color[0]);
       pixel_data[i * 3 + 1] = (color[1]);

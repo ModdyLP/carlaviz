@@ -36,7 +36,7 @@ static inline char *carlaviz_timenow();
 #define CARLAVIZ_DEBUG_LEVEL     0x04
 
 #ifndef CARLAVIZ_LOG_LEVEL
-#define CARLAVIZ_LOG_LEVEL   CARLAVIZ_DEBUG_LEVEL
+#define CARLAVIZ_LOG_LEVEL   CARLAVIZ_ERROR_LEVEL
 #endif
 
 
@@ -87,12 +87,12 @@ static inline char *carlaviz_timenow() {
     static char buffer[64];
     time_t rawtime;
     struct tm *timeinfo;
-    
+
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    
+
     strftime(buffer, 64, "%Y-%m-%d %H:%M:%S", timeinfo);
-    
+
     return buffer;
 }
 

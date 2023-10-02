@@ -40,6 +40,7 @@ void Backend::Run() {
       CARLAVIZ_LOG_INFO("Using experimental server");
       server_->Serve();
     } else {
+      CARLAVIZ_LOG_ERROR("Backend is all up and running");
       while (true) {
         // auto start = std::chrono::high_resolution_clock::now();
         auto xviz = carla_proxy_->GetUpdateData();

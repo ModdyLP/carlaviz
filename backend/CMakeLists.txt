@@ -9,6 +9,7 @@ message(STATUS "CMAKE BUILD TYPE: ${CMAKE_BUILD_TYPE}")
 SET(CMAKE_CXX_FLAGS "-std=c++17 -pthread -fPIC")
 
 SET(CLIENT_ROOT_FOLDER ${CMAKE_CURRENT_SOURCE_DIR})
+SET(CARLAVIZ_LOG_LEVEL ${CARLAVIZ_LOG_LEVEL})
 
 set(CMAKE_BUILD_TYPE "Client")
 include("third_party/LibCarla/cmake/CMakeLists.txt.in")
