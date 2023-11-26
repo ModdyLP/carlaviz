@@ -62,7 +62,7 @@ class FrontendProxy {
   void AddClient(boost::asio::ip::tcp::socket socket);
   void SendMetadata(const boost::shared_ptr<FrontendClient>& client);
 
-  uint16_t frontend_listen_port_ = 8081u;
+  uint16_t frontend_listen_port_ = std::stoi(std::getenv("CARLAVIZ_BACKEND_PORT"));
   std::mutex update_metadata_lock_{};
   std::string updated_metadata_with_map_{""};
   std::string updated_metadata_without_map_{""};

@@ -101,7 +101,7 @@ void Backend::Init() {
       &CarlaHandler::UpdateMetadata, carla_handler, std::placeholders::_1
     ));
   } else {
-    frontend_proxy_ = std::make_shared<FrontendProxy>(8081u);
+    frontend_proxy_ = std::make_shared<FrontendProxy>(std::stoi(std::getenv("CARLAVIZ_BACKEND_PORT")));
     frontend_proxy_->StartListen();
     frontend_proxy_->SetMapString(carla_proxy_->GetMapString());
     frontend_proxy_->UpdateMetadata(carla_proxy_->GetMetadata());
@@ -117,11 +117,8 @@ void Backend::Init() {
 int main(int argc, char** argv) {
   signal(SIGINT, signal_handler);
   signal(SIGTERM, signal_handler);
-  if (argc > 2) {
-    // CARLAVIZ_LOG_INFO("You are running Carla simulator on %s:%s", argv[1], argv[2]);
-    uint16_t port = (uint16_t) std::stoi(argv[2]);
-    backend.SetCarlaHostAndPort(argv[1], port);
-  }
+
+  backend.SetCarlaHostAndPort(std::getenv("CARLA_SERVER_HOST"), std::stoi(std::getenv("CARLA_SERVER_PORT")));
   backend.Init();
   backend.Run();
 }

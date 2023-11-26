@@ -23,68 +23,71 @@ const {resolve} = require('path');
 const webpack = require('webpack');
 
 const BABEL_CONFIG = {
-  presets: ['@babel/preset-env', '@babel/preset-react'],
-  plugins: ['@babel/proposal-class-properties']
+    presets: ['@babel/preset-env', '@babel/preset-react'],
+    plugins: ['@babel/proposal-class-properties']
 };
 
 const CONFIG = {
-  mode: 'development',
-  entry: {
-    app: resolve('./src/app.js')
-  },
-  devtool: 'source-map',
-  output: {
-    path: resolve('./dist'),
-    filename: 'bundle.js'
-  },
-  module: {
-    noParse: /(mapbox-gl)\.js$/,
-    rules: [
-      {
-        // Compile ES2015 using bable
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: 'babel-loader',
-            options: BABEL_CONFIG
-          }
+    mode: 'development',
+    entry: {
+        app: resolve('./src/app.js')
+    },
+    devtool: 'source-map',
+    output: {
+        path: resolve('./dist'),
+        filename: 'bundle.js'
+    },
+    module: {
+        noParse: /(mapbox-gl)\.js$/,
+        rules: [
+            {
+                // Compile ES2015 using bable
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: BABEL_CONFIG
+                    }
+                ]
+            },
+            {
+                test: /\.(png|jpe?g|gif)$/i,
+                use: [
+                    {
+                        loader: 'file-loader',
+                    },
+                ],
+            },
+            {
+                test: /\.css$/,
+                use: ["style-loader", "css-loader"]
+            },
+            {
+                // Unfortunately, webpack doesn't import library sourcemaps on its own...
+                test: /\.js$/,
+                use: ['source-map-loader'],
+                enforce: 'pre'
+            }
         ]
-      },
-      {
-        test: /\.(png|jpe?g|gif)$/i,
-        use: [
-          {
-            loader: 'file-loader',
-          },
-        ],
-      },
-      {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader"]
-      },
-      {
-        // Unfortunately, webpack doesn't import library sourcemaps on its own...
-        test: /\.js$/,
-        use: ['source-map-loader'],
-        enforce: 'pre'
-      }
+    },
+    plugins: [
+        new webpack.HotModuleReplacementPlugin()
     ]
-  },
-  plugins: [
-    new webpack.HotModuleReplacementPlugin()
-  ]
 };
 
-module.exports = (env = {}) => {
-  let config = Object.assign({}, CONFIG);
+module.exports = (env) => {
+    let config = Object.assign({}, CONFIG);
 
-  // This switch between streaming and static file loading
-  require('dotenv').config()
-  config.plugins = config.plugins.concat([
-    new webpack.DefinePlugin({__BACKEND_HOST__: JSON.stringify(process.env.CARLAVIZ_BACKEND_HOST || "")}),
-    new webpack.DefinePlugin({__BACKEND_PORT__: JSON.stringify(process.env.CARLAVIZ_BACKEND_PORT || "")})
-  ]);
+    // This switch between streaming and static file loading
+    require('dotenv').config()
 
-  return config;
+    config.plugins = config.plugins.concat([new webpack.DefinePlugin({
+        'env': {
+            'CARLAVIZ_BACKEND_PORT': JSON.stringify(process.env.CARLAVIZ_BACKEND_PORT),
+            'CARLAVIZ_BACKEND_HOST': JSON.stringify(process.env.CARLAVIZ_BACKEND_HOST)
+        }
+    })])
+    console.log("OUT", process.env, config)
+    return config;
 };

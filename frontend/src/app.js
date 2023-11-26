@@ -20,208 +20,205 @@
 
 /* global document, console */
 /* eslint-disable no-console, no-unused-vars, no-undef */
-import React, { PureComponent } from "react";
-import { render } from "react-dom";
+import React, {PureComponent} from "react";
+import {render} from "react-dom";
 
-import { GeoJsonLayer } from "@deck.gl/layers";
-import { COORDINATE_SYSTEM } from "@deck.gl/core";
-import {
-  LogViewer,
-  StreamSettingsPanel,
-  MeterWidget,
-  XVIZPanel,
-  XVIZLiveLoader,
-  VIEW_MODE
-} from "streetscape.gl";
-import { Form, ThemeProvider } from "@streetscape.gl/monochrome";
+import {GeoJsonLayer} from "@deck.gl/layers";
+import {COORDINATE_SYSTEM} from "@deck.gl/core";
+import {LogViewer, MeterWidget, StreamSettingsPanel, VIEW_MODE, XVIZLiveLoader, XVIZPanel} from "streetscape.gl";
+import {Form, ThemeProvider} from "@streetscape.gl/monochrome";
 
-import { APP_SETTINGS, XVIZ_STYLE, CAR, UI_THEME } from "./constants";
+import {APP_SETTINGS, CAR, UI_THEME, XVIZ_STYLE} from "./constants";
 
 import githubIcon from "../public/github_icon.png";
 
 import "./index.css";
 
-const backendHostname = (__BACKEND_HOST__ === "" ? document.location.hostname : __BACKEND_HOST__)
-const backendPort = (__BACKEND_PORT__ === "" ? 8081 : __BACKEND_PORT__)
+const backendHostname =
+    env.CARLAVIZ_BACKEND_HOST === "" ? document.location.hostname : env.CARLAVIZ_BACKEND_HOST;
+const backendPort = env.CARLAVIZ_BACKEND_PORT === "" ? 8081 : env.CARLAVIZ_BACKEND_PORT;
 
 const carlaLog = new XVIZLiveLoader({
-  logGuid: "mock",
-  bufferLength: 10,
-  serverConfig: {
-    defaultLogLength: 50,
-    serverUrl: "ws://" + backendHostname + ":" + backendPort
-  },
-  worker: true,
-  maxConcurrency: 10
+    logGuid: "mock",
+    bufferLength: 10,
+    serverConfig: {
+        defaultLogLength: 50,
+        serverUrl: "ws://" + backendHostname + ":" + backendPort
+    },
+    worker: true,
+    maxConcurrency: 10
 });
 
 const tableComponentProps = {
-  table: {
-    height: 120
-  }
+    table: {
+        height: 120
+    }
 };
+
 class CarlaViz extends PureComponent {
-  state = {
-    log: carlaLog,
-    metadataReceived: false,
-    settings: {
-      viewMode: "PERSPECTIVE",
-      showTooltip: true
-    }
-  };
-
-  componentDidMount() {
-    const { log } = this.state;
-    log
-      .on("ready", () => {
-        const metadata = log.getMetadata();
-        log.socket.onclose = () => {
-          this.setState({
-            metadataReceived: false
-          });
-        };
-        if (metadata.map) {
-          const mapLayer = new GeoJsonLayer({
-            coordinateSystem: COORDINATE_SYSTEM.METER_OFFSETS,
-            coordinateOrigin: [0, 0, 0],
-            id: "carla_map",
-            data: metadata.map,
-            stroked: true,
-            filled: true,
-            wireframe: true,
-            extruded: true,
-            getFillColor: [255, 255, 255, 255],
-            getLineColor: [255, 255, 255, 255],
-            getLineWidth: 0.1,
-            getRadius: 0.00001,
-            opacity: 10
-          });
-          this.setState({
-            map: mapLayer,
-            metadataReceived: true
-          });
-          console.log("get map");
-        } else {
-          this.setState({
-            metadataReceived: true
-          });
-          console.log("receive metadata without map");
+    state = {
+        log: carlaLog,
+        metadataReceived: false,
+        settings: {
+            viewMode: "PERSPECTIVE",
+            showTooltip: true
         }
-      })
-      .on("error", console.error)
-      .connect();
-  }
+    };
 
-  _onSettingsChange = changedSettings => {
-    this.setState({
-      settings: { ...this.state.settings, ...changedSettings }
-    });
-  };
-
-  _onStreamSettingChange = changedSettings => {
-    const { log } = this.state;
-    if (log && log.isOpen()) {
-      log.socket.send(JSON.stringify(changedSettings));
-    } else {
-      console.log("socket is closed");
+    componentDidMount() {
+        const {log} = this.state;
+        log
+            .on("ready", () => {
+                const metadata = log.getMetadata();
+                log.socket.onclose = () => {
+                    this.setState({
+                        metadataReceived: false
+                    });
+                };
+                if (metadata.map) {
+                    const mapLayer = new GeoJsonLayer({
+                        coordinateSystem: COORDINATE_SYSTEM.METER_OFFSETS,
+                        coordinateOrigin: [0, 0, 0],
+                        id: "carla_map",
+                        data: metadata.map,
+                        stroked: true,
+                        filled: true,
+                        wireframe: true,
+                        extruded: true,
+                        getFillColor: [255, 255, 255, 255],
+                        getLineColor: [255, 255, 255, 255],
+                        getLineWidth: 0.1,
+                        getRadius: 0.00001,
+                        opacity: 10
+                    });
+                    this.setState({
+                        map: mapLayer,
+                        metadataReceived: true
+                    });
+                    console.log("get map");
+                } else {
+                    this.setState({
+                        metadataReceived: true
+                    });
+                    console.log("receive metadata without map");
+                }
+            })
+            .on("error", console.error)
+            .connect();
     }
-  };
 
-  render() {
-    const { log, map, metadataReceived, settings } = this.state;
-    let customLayers = [];
-    if (map) {
-      customLayers = [map];
+    _onSettingsChange = changedSettings => {
+        this.setState({
+            settings: {...this.state.settings, ...changedSettings}
+        });
+    };
+
+    _onStreamSettingChange = changedSettings => {
+        const {log} = this.state;
+        if (log && log.isOpen()) {
+            log.socket.send(JSON.stringify(changedSettings));
+        } else {
+            console.log("socket is closed");
+        }
+    };
+
+    render() {
+        const {log, map, metadataReceived, settings} = this.state;
+        let customLayers = [];
+        if (map) {
+            customLayers = [map];
+        }
+
+        console.log("Connecting to", backendHostname, backendPort, env)
+
+        return (
+            <div id="container">
+                <div id="control-panel">
+                    <div id="github">
+                        <p>
+                            <a href="https://github.com/wx9698/carlaviz" target="_blank">
+                                CarlaViz
+                            </a>
+                        </p>
+                        <a href="https://github.com/wx9698/carlaviz" target="_blank">
+                            <img src={githubIcon}></img>
+                        </a>
+                    </div>
+                    {metadataReceived ? (
+                        <div>
+                            <hr id="github-hr"/>
+                            <XVIZPanel log={log} name="Metrics"/>
+                            <hr/>
+                            <XVIZPanel log={log} name="Camera"/>
+                            <hr/>
+                            <XVIZPanel
+                                log={log}
+                                name="Tables"
+                                componentProps={tableComponentProps}
+                            />
+                            <hr/>
+                            <Form
+                                data={APP_SETTINGS}
+                                values={this.state.settings}
+                                onChange={this._onSettingsChange}
+                            />
+                            <StreamSettingsPanel
+                                log={log}
+                                onSettingsChange={this._onStreamSettingChange}
+                            />
+                        </div>
+                    ) : (
+                        <div>
+                            <h4>Launch the backend and refresh</h4>
+                        </div>
+                    )}
+                </div>
+                <div id="log-panel">
+                    <div id="map-view">
+                        <LogViewer
+                            log={log}
+                            showMap={false}
+                            car={CAR}
+                            xvizStyles={XVIZ_STYLE}
+                            showTooltip={settings.showTooltip}
+                            viewMode={VIEW_MODE[settings.viewMode]}
+                            customLayers={customLayers}
+                        />
+                        {metadataReceived ? (
+                            <div id="hud">
+                                <MeterWidget
+                                    log={log}
+                                    streamName="/vehicle/acceleration"
+                                    label="Acceleration"
+                                    min={-10}
+                                    max={10}
+                                />
+                                <hr/>
+                                <MeterWidget
+                                    log={log}
+                                    streamName="/vehicle/velocity"
+                                    label="Speed"
+                                    getWarning={x => (x > 6 ? "FAST" : "")}
+                                    min={0}
+                                    max={20}
+                                />
+                            </div>
+                        ) : (
+                            <div></div>
+                        )}
+                    </div>
+                </div>
+                <div id="author-info">
+                    <p>Author: Minjun Xu</p>
+                </div>
+            </div>
+        );
     }
-
-    return (
-      <div id="container">
-        <div id="control-panel">
-          <div id="github">
-            <p>
-              <a href="https://github.com/wx9698/carlaviz" target="_blank">
-                CarlaViz
-              </a>
-            </p>
-            <a href="https://github.com/wx9698/carlaviz" target="_blank">
-              <img src={githubIcon}></img>
-            </a>
-          </div>
-          {metadataReceived ? (
-            <div>
-              <hr id="github-hr" />
-              <XVIZPanel log={log} name="Metrics" />
-              <hr />
-              <XVIZPanel log={log} name="Camera" />
-              <hr />
-              <XVIZPanel
-                log={log}
-                name="Tables"
-                componentProps={tableComponentProps}
-              />
-              <hr />
-              <Form
-                data={APP_SETTINGS}
-                values={this.state.settings}
-                onChange={this._onSettingsChange}
-              />
-              <StreamSettingsPanel
-                log={log}
-                onSettingsChange={this._onStreamSettingChange}
-              />
-            </div>
-          ) : (
-            <div>
-              <h4>Launch the backend and refresh</h4>
-            </div>
-          )}
-        </div>
-        <div id="log-panel">
-          <div id="map-view">
-            <LogViewer
-              log={log}
-              showMap={false}
-              car={CAR}
-              xvizStyles={XVIZ_STYLE}
-              showTooltip={settings.showTooltip}
-              viewMode={VIEW_MODE[settings.viewMode]}
-              customLayers={customLayers}
-            />
-            {metadataReceived ? (
-              <div id="hud">
-                <MeterWidget
-                  log={log}
-                  streamName="/vehicle/acceleration"
-                  label="Acceleration"
-                  min={-10}
-                  max={10}
-                />
-                <hr />
-                <MeterWidget
-                  log={log}
-                  streamName="/vehicle/velocity"
-                  label="Speed"
-                  getWarning={x => (x > 6 ? "FAST" : "")}
-                  min={0}
-                  max={20}
-                />
-              </div>
-            ) : (
-              <div></div>
-            )}
-          </div>
-        </div>
-        <div id="author-info">
-          <p>Author: Minjun Xu</p>
-        </div>
-      </div>
-    );
-  }
 }
 
 render(
-  <ThemeProvider theme={UI_THEME}>
-    <CarlaViz />
-  </ThemeProvider>,
-  document.getElementById("app")
+    <ThemeProvider theme={UI_THEME}>
+        <CarlaViz/>
+    </ThemeProvider>,
+    document.getElementById("app")
 );
