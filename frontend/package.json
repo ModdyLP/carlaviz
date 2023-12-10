@@ -4,14 +4,13 @@
   "version": "0.9.13",
   "license": "MIT",
   "scripts": {
-    "start": "webpack-dev-server --host 0.0.0.0 --disable-host-check --env.live --progress --hot --open",
+    "start": "webpack-dev-server",
     "prettier": "prettier --write '{public,src}/**/*.{ts,js,css,html}' index.html",
     "build": "NODE_ENV=production webpack -p"
   },
   "dependencies": {
     "@deck.gl/core": "^8.0.0",
     "@deck.gl/layers": "^8.0.0",
-    "dotenv": "8.2.0",
     "react": "^16.3.0",
     "react-dom": "^16.3.0",
     "streetscape.gl": "^1.0.0"

@@ -19,7 +19,7 @@
 // THE SOFTWARE.
 
 /* eslint-disable no-process-env */
-const {resolve} = require('path');
+const {resolve, join} = require('path');
 const webpack = require('webpack');
 
 const BABEL_CONFIG = {
@@ -36,6 +36,12 @@ const CONFIG = {
     output: {
         path: resolve('./dist'),
         filename: 'bundle.js'
+    },
+    devServer: {
+        host: process.env.CARLAVIZ_FRONTEND_HOST || '0.0.0.0',
+        compress: true,
+        port: process.env.CARLAVIZ_FRONTEND_PORT || 8080,
+        open: false,
     },
     module: {
         noParse: /(mapbox-gl)\.js$/,
@@ -80,7 +86,6 @@ module.exports = (env) => {
     let config = Object.assign({}, CONFIG);
 
     // This switch between streaming and static file loading
-    require('dotenv').config()
 
     config.plugins = config.plugins.concat([new webpack.DefinePlugin({
         'env': {
@@ -88,6 +93,8 @@ module.exports = (env) => {
             'CARLAVIZ_BACKEND_HOST': JSON.stringify(process.env.CARLAVIZ_BACKEND_HOST)
         }
     })])
+    
+    
     console.log("OUT", process.env, config)
     return config;
 };

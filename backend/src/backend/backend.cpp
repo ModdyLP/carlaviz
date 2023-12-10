@@ -119,6 +119,7 @@ int main(int argc, char** argv) {
   signal(SIGTERM, signal_handler);
 
   backend.SetCarlaHostAndPort(std::getenv("CARLA_SERVER_HOST"), std::stoi(std::getenv("CARLA_SERVER_PORT")));
+  backend.SetTimeInterval(std::stoi(std::getenv("UPDATE_INTERVAL")));
   backend.Init();
   backend.Run();
 }

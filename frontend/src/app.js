@@ -20,7 +20,7 @@
 
 /* global document, console */
 /* eslint-disable no-console, no-unused-vars, no-undef */
-import React, {PureComponent} from "react";
+import React, {PureComponent, useEffect} from "react";
 import {render} from "react-dom";
 
 import {GeoJsonLayer} from "@deck.gl/layers";
@@ -122,14 +122,18 @@ class CarlaViz extends PureComponent {
         }
     };
 
+
+
     render() {
         const {log, map, metadataReceived, settings} = this.state;
         let customLayers = [];
         if (map) {
             customLayers = [map];
         }
-
-        console.log("Connecting to", backendHostname, backendPort, env)
+        useEffect(() => {
+            console.log(log)
+        }, [log])
+        //console.log("Connecting to", backendHostname, backendPort, env)
 
         return (
             <div id="container">
