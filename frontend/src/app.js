@@ -130,9 +130,6 @@ class CarlaViz extends PureComponent {
         if (map) {
             customLayers = [map];
         }
-        useEffect(() => {
-            console.log(log)
-        }, [log])
         //console.log("Connecting to", backendHostname, backendPort, env)
 
         return (
