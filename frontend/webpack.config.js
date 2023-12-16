@@ -42,6 +42,7 @@ const CONFIG = {
         compress: true,
         port: process.env.CARLAVIZ_FRONTEND_PORT || 8080,
         open: false,
+        disableHostCheck: true
     },
     module: {
         noParse: /(mapbox-gl)\.js$/,
