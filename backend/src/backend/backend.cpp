@@ -86,7 +86,7 @@ void Backend::Init() {
   carla_proxy_ = std::make_shared<CarlaProxy>(carla_host_, carla_port_, is_experimental_);
   carla_proxy_->Init();
 
-  drawing_proxy_ = std::make_shared<DrawingProxy>(8089u);
+  drawing_proxy_ = std::make_shared<DrawingProxy>(std::stoi(std::getenv("PAINTER_PORT")));
   drawing_proxy_->StartListen();
 
   if (is_experimental_) {
